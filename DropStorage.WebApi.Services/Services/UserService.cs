@@ -17,6 +17,7 @@ namespace DropStorage.WebApi.Services.Services
 
         public async Task<bool> CreateUser(CreateModifyUserDTO createModifyUserDTO)
         {
+            //TODO Create Hash Pasword
             bool isSaved = await _userDataAccess.CreateUser(createModifyUserDTO);
 
             return isSaved;
