@@ -1,3 +1,6 @@
+using DropStorage.Core.Cors;
+using DropStorage.Core.Jwt;
+using DropStorage.Core.Swagger;
 using DropStorage.WebApi.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -13,22 +16,20 @@ IConfiguration configuration = builder.Configuration;
 // Services
 IServiceCollection services = builder.Services;
 
-services.AddCors(options =>
-{
-    options.AddPolicy(name: "MyPolicy",
-    builder =>
-    {
-        builder.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
-
 ILogger logger = NullLogger.Instance;
 services.AddSingleton(typeof(ILogger), logger);
 
 // Business
 services.AddBusinessServices(configuration);
+
+// Cors
+services.AddCorsPolicy();
+
+// Swagger
+services.AddSwagger();
+
+//JWT
+services.AddJwtAuthentication(configuration);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -1,23 +1,59 @@
 ﻿
 using DropStorage.WebApi.DataModel.Models;
+using DropStorage.WebApi.DataModel.Security;
+using DropStorage.WebApi.Services.Constants;
+using DropStorage.WebApi.Services.Exceptions;
+using DropStorage.WebApi.Services.Services.AuthServices;
 using DropStorage.WebApi.ServicesDataAccess.DataAccess;
-using DropStorage.WebApi.ServicesDataAccess.DTOs;
+using DropStorage.WebApi.ServicesDataAccess.DTOs.Auth;
 using DropStorage.WebApi.ServicesDataAccess.DTOs.User;
+using System.Net;
+using System.Security.Claims;
 
 namespace DropStorage.WebApi.Services.Services
 {
     public class UserService
     {
         private readonly UserDataAccess _userDataAccess;
+        private JwtTokenService _tokenService;
 
-        public UserService(UserDataAccess userDataAccess)
+        public UserService(UserDataAccess userDataAccess, JwtTokenService tokenService)
         {
-            this._userDataAccess = userDataAccess;
+            _userDataAccess = userDataAccess;
+            _tokenService = tokenService;
+        }
+
+        public async Task<AuthDTO> Token(AccessDTO access)
+        {
+            User? user = await _userDataAccess.GetByUsername(access.username);
+
+            if (user == null || !Hasher.VerifyIdentityV3Hash(access.password, user.Password))
+            {
+                throw new HttpStatusException(HttpStatusCode.Unauthorized, ErrorCode.Unauthorized, "User name or password wrong!");
+            }
+
+            List<Claim> userClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Login),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Role, (user.Rol != null ? user.Rol.Description : "Usuario"))
+            };
+
+            string accessToken = this._tokenService.GenerateAccessToken(userClaims);
+            //string refreshToken = this.tokenService.GenerateRefreshToken();
+
+            return new AuthDTO()
+            {
+                access_token = accessToken,
+                //refresh_token = refreshToken,
+            };
         }
 
         public async Task<bool> CreateUser(CreateModifyUserDTO createModifyUserDTO)
         {
-            //TODO Create Hash Pasword
+            //Create pass with hash
+            createModifyUserDTO.Password = Hasher.GenerateIdentityV3Hash(createModifyUserDTO.Password);
+
             bool isSaved = await _userDataAccess.CreateUser(createModifyUserDTO);
 
             return isSaved;

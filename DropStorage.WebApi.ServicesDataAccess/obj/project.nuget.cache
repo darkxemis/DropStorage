@@ -1,11 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "oxuJtGck70WobKwDMmH9K9Ulqim134TPsWu5jQRmfZbPOafHT6NiXteyrNDM3rEAORLh+zQFSPhYR1CFAGBHow==",
+  "dgSpecHash": "d2td6Cs1/6OWueGBFL6iAwK4F4HgQBW2wVxFqUfhSkXai2dS7R2K4mEKEm4rgwUmOkImEjrpvHfS5SuPp9t4YA==",
   "success": true,
   "projectFilePath": "C:\\Users\\josemi\\source\\repos\\DropStorage\\DropStorage.WebApi.ServicesDataAccess\\DropStorage.WebApi.ServicesDataAccess.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\josemi\\.nuget\\packages\\automapper\\12.0.0\\automapper.12.0.0.nupkg.sha512",
     "C:\\Users\\josemi\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.0\\automapper.extensions.microsoft.dependencyinjection.12.0.0.nupkg.sha512",
+    "C:\\Users\\josemi\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\6.0.10\\microsoft.aspnetcore.cryptography.internal.6.0.10.nupkg.sha512",
+    "C:\\Users\\josemi\\.nuget\\packages\\microsoft.aspnetcore.cryptography.keyderivation\\6.0.10\\microsoft.aspnetcore.cryptography.keyderivation.6.0.10.nupkg.sha512",
     "C:\\Users\\josemi\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Users\\josemi\\.nuget\\packages\\microsoft.data.sqlclient\\2.1.4\\microsoft.data.sqlclient.2.1.4.nupkg.sha512",
     "C:\\Users\\josemi\\.nuget\\packages\\microsoft.data.sqlclient.sni.runtime\\2.1.1\\microsoft.data.sqlclient.sni.runtime.2.1.1.nupkg.sha512",

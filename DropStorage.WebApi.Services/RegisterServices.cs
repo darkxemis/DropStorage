@@ -1,5 +1,6 @@
 ﻿using DropStorage.WebApi.Services.Extensions;
 using DropStorage.WebApi.Services.Services;
+using DropStorage.WebApi.Services.Services.AuthServices;
 using DropStorage.WebApi.ServicesDataAccess;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +23,7 @@ namespace DropStorage.WebApi.Services
         public static IServiceCollection RegisterBusinessServices(this IServiceCollection services)
         {
             // Auth
-            //services.AddTransient<ITokenService, JwtTokenService>();
+            services.AddTransient<JwtTokenService>();
 
             // Business
             services.AddTransient<UserService>();

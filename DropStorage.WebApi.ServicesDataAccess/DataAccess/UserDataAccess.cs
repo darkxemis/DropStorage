@@ -4,6 +4,7 @@ using DropStorage.WebApi.DataModel.Core;
 using DropStorage.WebApi.DataModel.Models;
 using DropStorage.WebApi.ServicesDataAccess.DTOs;
 using DropStorage.WebApi.ServicesDataAccess.DTOs.User;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DropStorage.WebApi.ServicesDataAccess.DataAccess
@@ -20,6 +21,23 @@ namespace DropStorage.WebApi.ServicesDataAccess.DataAccess
             _EF = ef;
             _mapper = mapper;
             _logger = logger;
+        }
+
+        public async Task<User?> GetByUsername(string username)
+        {
+            EFRepository<User> repo = _EF.Repository<User>();
+            User? user = await repo.Query()
+                .Include(user => user.Rol)
+                .FirstOrDefaultAsync(user => user.Login.ToLower() == username.ToLower());
+            return user;
+        }
+
+        public async Task<bool> UpdateAsync(User user)
+        {
+            EFRepository<User> repo = _EF.Repository<User>();
+            repo.Update(user);
+            bool isSaved = await _EF.SaveChangesAsync();
+            return isSaved;
         }
 
         public async Task<bool> CreateUser(CreateModifyUserDTO createModifyUserDTO)
