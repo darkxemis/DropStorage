@@ -44,21 +44,14 @@ namespace DropStorage.WebApi.ServicesDataAccess.DataAccess
         {
             bool isSaved = false;
 
-            try
-            {
-                User user = new User();
+            User user = new User();
 
-                _mapper.Map(createModifyUserDTO, user);
+            _mapper.Map(createModifyUserDTO, user);
 
-                EFRepository<User> repo = this._EF.Repository<User>();
-                repo.Insert(user);
+            EFRepository<User> repo = this._EF.Repository<User>();
+            repo.Insert(user);
 
-                isSaved = await this._EF.SaveChangesAsync();
-
-            } catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-            }
+            isSaved = await this._EF.SaveChangesAsync();
 
             return isSaved;
         }

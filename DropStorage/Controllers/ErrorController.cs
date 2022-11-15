@@ -9,6 +9,13 @@ namespace DropStorage.Controllers
     [ApiExplorerSettings(IgnoreApi = true)]
     public class ErrorController : ControllerBase
     {
+        private readonly ILogger _logger;
+
+        public ErrorController(ILogger logger)
+        {
+            _logger = logger;
+        }
+
         [Route("error-local-development")]
         public ErrorResponse ErrorLocalDevelopment()
         {
@@ -16,6 +23,7 @@ namespace DropStorage.Controllers
             var exception = context.Error; // Your exception
             var code = 500; // Internal Server Error by default
 
+            _logger.LogError(exception.Message);
             //if (exception is LogInException) code = 401; // Unauthorized
             //else if (exception is LogInException) code = 404; // Not Found
             //else if (exception is MyException) code = 400; // Bad Request
