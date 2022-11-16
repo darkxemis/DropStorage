@@ -33,7 +33,7 @@ namespace DropStorage.Controllers
             return new ErrorResponse(exception); // Error model
         }
 
-        [Route("error")]
-        public IActionResult Error() => Problem();
+        [Route("/error")]
+        public IActionResult HandleError() => Problem();
     }
 }

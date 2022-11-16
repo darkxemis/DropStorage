@@ -1,4 +1,5 @@
 using DropStorage.Core.Cors;
+using DropStorage.Core.Exceptions;
 using DropStorage.Core.Jwt;
 using DropStorage.Core.Swagger;
 using DropStorage.WebApi.Services;
@@ -19,6 +20,18 @@ IServiceCollection services = builder.Services;
 ILogger logger = NullLogger.Instance;
 services.AddSingleton(typeof(ILogger), logger);
 
+services.AddCors(options =>
+{
+    options.AddPolicy(name: "CorsPolicy",
+    builder =>
+    {
+            // Any origin allowed
+            builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+    });
+});
+
 // Business
 services.AddBusinessServices(configuration);
 
@@ -38,22 +51,27 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseExceptionHandler("/error-local-development"); // Add this
+    app.UseErrorControllerAsExceptionHandler();
+    // app.UseDeveloperExceptionPage(); // descomentar para que devuelva la traza del error
 }
 else
 {
-    app.UseExceptionHandler("/error");
+    app.UseErrorControllerAsExceptionHandler();
+    app.UseHsts();
 }
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-app.UseCors("MyPolicy");
+app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseCors("CorsPolicy");
 
 app.MapControllers();
 
