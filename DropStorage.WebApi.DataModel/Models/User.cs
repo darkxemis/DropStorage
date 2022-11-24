@@ -1,11 +1,14 @@
 ﻿using DropStorage.WebApi.DataModel.Core.Abstractions;
-using System;
-using System.Collections.Generic;
 
 namespace DropStorage.WebApi.DataModel.Models
 {
     public partial class User : IEntity
     {
+        public User()
+        {
+            LogStatuses = new HashSet<LogStatus>();
+        }
+
         public Guid Id { get; set; }
         public string Login { get; set; } = null!;
         public string Password { get; set; } = null!;
@@ -17,5 +20,7 @@ namespace DropStorage.WebApi.DataModel.Models
         public Guid? RolId { get; set; }
 
         public virtual Rol? Rol { get; set; }
+        public virtual ICollection<LogStatus> LogStatuses { get; set; }
+
     }
 }

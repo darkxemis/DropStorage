@@ -4,6 +4,7 @@ using DropStorage.WebApi.DataModel.Models;
 using DropStorage.WebApi.DataModel.Security;
 using DropStorage.WebApi.Services.Constants;
 using DropStorage.WebApi.Services.Exceptions;
+using DropStorage.WebApi.Services.Extensions;
 using DropStorage.WebApi.Services.Services.AuthServices;
 using DropStorage.WebApi.ServicesDataAccess.DataAccess;
 using DropStorage.WebApi.ServicesDataAccess.DTOs;
@@ -19,12 +20,21 @@ namespace DropStorage.WebApi.Services.Services
         private readonly UserDataAccess _userDataAccess;
         private JwtTokenService _tokenService;
         private readonly IMapper _mapper;
+        private readonly LogStatusService _logStatusService;
 
-        public UserService(UserDataAccess userDataAccess, JwtTokenService tokenService, IMapper mapper)
+        public UserService(UserDataAccess userDataAccess, JwtTokenService tokenService, IMapper mapper, LogStatusService logStatusService)
         {
             _userDataAccess = userDataAccess;
             _tokenService = tokenService;
             _mapper = mapper;
+            _logStatusService = logStatusService;
+        }
+
+        public async Task<UserDTO> GetUserByName(string userName)
+        {
+            UserDTO userDTO = new UserDTO();
+            User? user = await _userDataAccess.GetByUsername(userName);
+            return _mapper.Map(user, userDTO);
         }
 
         public async Task<AuthDTO> Token(AccessDTO access)
@@ -46,11 +56,24 @@ namespace DropStorage.WebApi.Services.Services
             string accessToken = this._tokenService.GenerateAccessToken(userClaims);
             //string refreshToken = this.tokenService.GenerateRefreshToken();
 
-            return new AuthDTO()
+            AuthDTO auth = new AuthDTO()
             {
                 access_token = accessToken,
                 //refresh_token = refreshToken,
             };
+
+            await _logStatusService.CreateLogStatus(new LogStatus()
+            {
+                CreateTime = DateTime.Now,
+                Description = "User log correct",
+                Endpoint = "api/auth/token",
+                ParameterRecived = access.GetAsJsonClass(),
+                ParameterSended = auth.GetAsJsonClass(),
+                IsError = false,
+                UserId = user.Id
+            });
+
+            return auth;
         }
 
         public async Task<bool> CreateUser(CreateModifyUserDTO createModifyUserDTO)
@@ -64,6 +87,16 @@ namespace DropStorage.WebApi.Services.Services
             userToSave.Password = password;
 
             bool isSaved = await _userDataAccess.CreateUser(userToSave);
+
+            await _logStatusService.CreateLogStatus(new LogStatus()
+            {
+                CreateTime = DateTime.Now,
+                Description = "User create correctly",
+                Endpoint = "api/user/create",
+                ParameterRecived = createModifyUserDTO.GetAsJsonClass(),
+                ParameterSended = isSaved.ToString(),
+                IsError = false
+            });
 
             return isSaved;
         }
@@ -97,11 +130,23 @@ namespace DropStorage.WebApi.Services.Services
             UserDTO userDTO = new UserDTO();
             _mapper.Map(userToModify, userDTO);
 
+            await _logStatusService.CreateLogStatus(new LogStatus()
+            {
+                CreateTime = DateTime.Now,
+                Description = string.Format("User updated correctly {0}", id),
+                Endpoint = "api/user/update",
+                ParameterRecived = createModifyUserDTO.GetAsJsonClass(),
+                ParameterSended = userDTO.GetAsJsonClass(),
+                IsError = false
+            });
+
             return userDTO;
         }
 
-        public async Task<bool> DeleteUser(Guid id)
+        public async Task<bool> DeleteUser(Guid id, string userName)
         {
+            User? userLogIn = await _userDataAccess.GetByUsername(userName);
+
             User? userToDetele = await _userDataAccess.GetUserById(id);
 
             if (userToDetele == null)
@@ -110,6 +155,17 @@ namespace DropStorage.WebApi.Services.Services
             }
 
             bool isDeleted = await _userDataAccess.DeleteUser(userToDetele);
+
+            await _logStatusService.CreateLogStatus(new LogStatus()
+            {
+                CreateTime = DateTime.Now,
+                Description = string.Format("User deleted correctly {0}", id),
+                Endpoint = "api/user/delete",
+                ParameterRecived = id.ToString(),
+                ParameterSended = isDeleted.ToString(),
+                IsError = false,
+                UserId = userLogIn?.Id
+            });
 
             return isDeleted;
         }

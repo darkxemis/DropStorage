@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DropStorage.Controllers
 {
     [ApiController]
-    public class UserController
+    public class UserController : ControllerBase
     {
         private readonly UserService _userService;
 
@@ -53,7 +53,8 @@ namespace DropStorage.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<bool> DeleteUser(Guid id)
         {
-            return await _userService.DeleteUser(id);
+            string userName = User.Identity.Name;
+            return await _userService.DeleteUser(id, userName);
         }
     }
 }

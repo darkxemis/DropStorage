@@ -34,6 +34,7 @@ namespace DropStorage.WebApi.DataModel.Models
 
         private void Configure(ModelBuilder builder)
         {
+            builder.ApplyConfiguration(new LogStatusConfiguration());
             builder.ApplyConfiguration(new RolConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
         }
