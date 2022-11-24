@@ -1,4 +1,6 @@
-﻿namespace DropStorage.WebApi.Services.Exceptions
+﻿using System.Net;
+
+namespace DropStorage.WebApi.Services.Exceptions
 {
     public class ErrorResponse
     {

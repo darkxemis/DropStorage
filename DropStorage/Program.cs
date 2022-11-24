@@ -32,6 +32,9 @@ services.AddCors(options =>
     });
 });
 
+//JWT
+services.AddJwtAuthentication(configuration);
+
 // Business
 services.AddBusinessServices(configuration);
 
@@ -40,9 +43,6 @@ services.AddCorsPolicy();
 
 // Swagger
 services.AddSwagger();
-
-//JWT
-services.AddJwtAuthentication(configuration);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -69,6 +69,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseCors("CorsPolicy");

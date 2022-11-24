@@ -1,4 +1,5 @@
 ﻿using DropStorage.WebApi.Services.Services;
+using DropStorage.WebApi.ServicesDataAccess.DTOs;
 using DropStorage.WebApi.ServicesDataAccess.DTOs.Auth;
 using DropStorage.WebApi.ServicesDataAccess.DTOs.User;
 using Microsoft.AspNetCore.Authorization;
@@ -23,26 +24,36 @@ namespace DropStorage.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<AuthDTO> Token([FromBody] AccessDTO access)
         {
-            return await this._userService.Token(access);
+            return await _userService.Token(access);
         }
 
         [Route("api/user/create")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<bool> Token([FromBody] CreateModifyUserDTO createModifyUserDTO)
+        public async Task<bool> CreateUser([FromBody] CreateModifyUserDTO createModifyUserDTO)
         {
-            return await this._userService.CreateUser(createModifyUserDTO);
+            return await _userService.CreateUser(createModifyUserDTO);
         }
 
         [Authorize]
-        [Route("api/user/prueba")]
-        [HttpPost]
+        [Route("api/user/update")]
+        [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<string> agg()
+        public async Task<UserDTO> UpdateUser(Guid id, [FromBody] CreateModifyUserDTO createModifyUserDTO)
         {
-            return "";
+            return await _userService.UpdateUser(id, createModifyUserDTO);
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [Route("api/user/delete")]
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<bool> DeleteUser(Guid id)
+        {
+            return await _userService.DeleteUser(id);
         }
     }
 }
