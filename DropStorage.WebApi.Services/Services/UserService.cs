@@ -2,10 +2,10 @@
 using AutoMapper;
 using DropStorage.WebApi.DataModel.Models;
 using DropStorage.WebApi.DataModel.Security;
-using DropStorage.WebApi.Services.Constants;
 using DropStorage.WebApi.Services.Exceptions;
 using DropStorage.WebApi.Services.Extensions;
 using DropStorage.WebApi.Services.Services.AuthServices;
+using DropStorage.WebApi.Services.Services.EmailServices;
 using DropStorage.WebApi.ServicesDataAccess.DataAccess;
 using DropStorage.WebApi.ServicesDataAccess.DTOs;
 using DropStorage.WebApi.ServicesDataAccess.DTOs.Auth;
@@ -21,13 +21,15 @@ namespace DropStorage.WebApi.Services.Services
         private JwtTokenService _tokenService;
         private readonly IMapper _mapper;
         private readonly LogStatusService _logStatusService;
+        private readonly EmailService _emailService;
 
-        public UserService(UserDataAccess userDataAccess, JwtTokenService tokenService, IMapper mapper, LogStatusService logStatusService)
+        public UserService(UserDataAccess userDataAccess, JwtTokenService tokenService, IMapper mapper, LogStatusService logStatusService, EmailService emailService)
         {
             _userDataAccess = userDataAccess;
             _tokenService = tokenService;
             _mapper = mapper;
             _logStatusService = logStatusService;
+            _emailService = emailService;
         }
 
         public async Task<UserDTO> GetUserByName(string userName)
@@ -168,6 +170,13 @@ namespace DropStorage.WebApi.Services.Services
             });
 
             return isDeleted;
+        }
+
+        public async Task<bool> ResetPasswordEmail()
+        {
+            bool isSended = await _emailService.SendMessageAsync();
+
+            return isSended;
         }
     }
 }

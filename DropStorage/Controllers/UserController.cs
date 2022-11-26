@@ -56,5 +56,15 @@ namespace DropStorage.Controllers
             string userName = User.Identity.Name;
             return await _userService.DeleteUser(id, userName);
         }
+
+        [Authorize]
+        [Route("api/user/resetpasswordemail")]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<bool> ResetPasswordEmail()
+        {
+            return await _userService.ResetPasswordEmail();
+        }
     }
 }
