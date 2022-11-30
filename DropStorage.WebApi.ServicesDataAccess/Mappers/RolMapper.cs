@@ -4,7 +4,7 @@ using DropStorage.WebApi.ServicesDataAccess.DTOs;
 
 namespace DropStorage.WebApi.ServicesDataAccess.Mappers
 {
-    internal class RolMapper : Profile
+    public class RolMapper : Profile
     {
         public RolMapper()
         {

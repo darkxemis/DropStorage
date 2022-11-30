@@ -6,6 +6,7 @@ namespace DropStorage.WebApi.DataModel.Models
     {
         public User()
         {
+            FileStorages = new HashSet<FileStorage>();
             LogStatuses = new HashSet<LogStatus>();
         }
 
@@ -21,6 +22,7 @@ namespace DropStorage.WebApi.DataModel.Models
 
         public virtual Rol? Rol { get; set; }
         public virtual ICollection<LogStatus> LogStatuses { get; set; }
+        public virtual ICollection<FileStorage> FileStorages { get; set; }
 
     }
 }

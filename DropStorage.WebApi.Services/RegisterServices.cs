@@ -32,6 +32,7 @@ namespace DropStorage.WebApi.Services
             // Business
             services.AddTransient<UserService>();
             services.AddTransient<LogStatusService>();
+            services.AddTransient<FileStorageService>();
 
             return services;
         }
