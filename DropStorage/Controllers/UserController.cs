@@ -27,6 +27,17 @@ namespace DropStorage.Controllers
             return await _userService.Token(access);
         }
 
+        [Authorize]
+        [Route("api/auth/user")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<UserDTO> GetUserByUserName(string userName)
+        {
+            return await _userService.GetUserByName(userName);
+        }
+
+        [Authorize]
         [Route("api/user/create")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
