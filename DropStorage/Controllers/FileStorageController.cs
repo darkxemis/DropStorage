@@ -1,9 +1,12 @@
 ﻿using DropStorage.WebApi.DataModel.Models;
+using DropStorage.WebApi.Services.Exceptions;
 using DropStorage.WebApi.Services.Services;
+using DropStorage.WebApi.ServicesDataAccess.DTOs;
 using DropStorage.WebApi.ServicesDataAccess.DTOs.FileStorage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IO.Compression;
+using System.Net;
 
 namespace DropStorage.Controllers
 {
@@ -11,10 +14,12 @@ namespace DropStorage.Controllers
     public class FileStorageController : ControllerBase
     {
         private readonly FileStorageService _fileStorageService;
+        private readonly UserService _userService;
 
-        public FileStorageController(FileStorageService fileStorageService)
+        public FileStorageController(FileStorageService fileStorageService, UserService userService)
         {
             _fileStorageService = fileStorageService;
+            _userService = userService;
         }
 
         [AllowAnonymous]
@@ -54,6 +59,41 @@ namespace DropStorage.Controllers
 
                 return this.File(ms.ToArray(), "application/zip", zipName);
             }
+        }
+
+        [AllowAnonymous]
+        [Route("api/auth/uploadfiles")]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<bool> UploadFile([FromForm] IFormFile file)
+        {
+            string userName = User.Identity.Name;
+            UserDTO activeUser = await _userService.GetUserByName(userName);
+
+            string filePath = Path.Combine(activeUser.DirectoryHome, file.FileName);
+            if (System.IO.File.Exists(filePath))
+            {
+                throw new HttpStatusException(HttpStatusCode.Forbidden, "File already exist in the system");
+            }
+            using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fileStream);
+            }
+
+            FileStorage newFileStorage = new FileStorage()
+            {
+                CreateTime = DateTime.Now,
+                Name = file.FileName,
+                Extension = Path.GetExtension(file.FileName),
+                SizeBytes = file.Length,
+                Url = string.Format("{0}{1}", activeUser.DirectoryHome, file.FileName),
+                UserId = activeUser.Id
+            };
+
+            bool isSaved = await _fileStorageService.InsertDropStorageFile(newFileStorage);
+
+            return isSaved;
         }
     }
 }

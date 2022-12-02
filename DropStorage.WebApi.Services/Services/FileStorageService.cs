@@ -27,5 +27,10 @@ namespace DropStorage.WebApi.Services.Services
             List<FileStorageDTO> fileStorageDTOList = new List<FileStorageDTO>();
             return _mapper.Map(fileStorageList, fileStorageDTOList);
         }
+
+        public async Task<bool> InsertDropStorageFile(FileStorage fileStorage)
+        {
+            return await _fileStorageDataAccess.InsertDropStorageFile(fileStorage);
+        }
     }
 }

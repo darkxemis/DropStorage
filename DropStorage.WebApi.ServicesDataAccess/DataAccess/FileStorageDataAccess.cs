@@ -37,5 +37,16 @@ namespace DropStorage.WebApi.ServicesDataAccess.DataAccess
 
             return fileStorageList;
         }
+
+        public async Task<bool> InsertDropStorageFile(FileStorage fileStorage)
+        {
+            bool isSaved = false;
+            EFRepository<FileStorage> repo = _EF.Repository<FileStorage>();
+
+            repo.Insert(fileStorage);
+            isSaved = await this._EF.SaveChangesAsync();
+
+            return isSaved;
+        }
     }
 }

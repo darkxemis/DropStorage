@@ -28,7 +28,7 @@ namespace DropStorage.WebApi.DataModel.Configurations
                 .IsUnicode(false)
                 .HasColumnName("name");
 
-            builder.Property(e => e.SizeMb).HasColumnName("sizeMB");
+            builder.Property(e => e.SizeBytes).HasColumnName("sizeBytes");
 
             builder.Property(e => e.Url)
                 .HasMaxLength(2000)

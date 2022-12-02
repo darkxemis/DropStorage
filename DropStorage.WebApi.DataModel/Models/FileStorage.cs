@@ -11,7 +11,7 @@ namespace DropStorage.WebApi.DataModel.Models
         public string Name { get; set; } = null!;
         public string Extension { get; set; } = null!;
         public string Url { get; set; } = null!;
-        public string SizeMb { get; set; } = null!;
+        public long SizeBytes { get; set; }
         public Guid UserId { get; set; }
 
         public virtual User? User { get; set; }
