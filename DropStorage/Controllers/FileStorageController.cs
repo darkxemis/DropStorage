@@ -22,7 +22,7 @@ namespace DropStorage.Controllers
             _userService = userService;
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [Route("api/auth/getallfiles")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -32,7 +32,7 @@ namespace DropStorage.Controllers
             return await _fileStorageService.GetAllFilesByUserId(idUser);
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [Route("api/auth/downloadfile")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -61,7 +61,7 @@ namespace DropStorage.Controllers
             }
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [Route("api/auth/uploadfiles")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -94,6 +94,26 @@ namespace DropStorage.Controllers
             bool isSaved = await _fileStorageService.InsertDropStorageFile(newFileStorage);
 
             return isSaved;
+        }
+
+        [Authorize]
+        [Route("api/auth/getImg")]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> DownloadGetImg(List<Guid> ids)
+        {
+            List<FileStorage> fileStorageList = await _fileStorageService.GetInfoFiles(ids);
+
+            if (fileStorageList.Count == 0)
+            {
+                throw new HttpStatusException(HttpStatusCode.Forbidden, "File not found");
+            }
+
+            FileStorage file = fileStorageList.FirstOrDefault();
+            byte[] fileByte = System.IO.File.ReadAllBytes(file.Url);
+
+            return File(fileByte, "image/jpg");
         }
     }
 }
