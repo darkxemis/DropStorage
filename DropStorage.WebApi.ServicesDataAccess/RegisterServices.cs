@@ -35,6 +35,7 @@ namespace DropStorage.WebApi.ServicesDataAccess
             services.AddTransient<UserDataAccess>();
             services.AddTransient<LogStatusDataAccess>();
             services.AddTransient<FileStorageDataAccess>();
+            services.AddTransient<ResetPasswordLinkDataAccess>();
 
             return services;
         }

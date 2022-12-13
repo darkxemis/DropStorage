@@ -16,8 +16,11 @@ namespace DropStorage.WebApi.DataModel.Models
         {
         }
 
+        public virtual DbSet<FileStorage> FileStorages { get; set; } = null!;
+        public virtual DbSet<LogStatus> LogStatuses { get; set; } = null!;
         public virtual DbSet<Rol> Rols { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
+        public virtual DbSet<ResetPasswordLink> ResetPasswordLinks { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -38,6 +41,7 @@ namespace DropStorage.WebApi.DataModel.Models
             builder.ApplyConfiguration(new RolConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
             builder.ApplyConfiguration(new FileStorageConfiguration());
+            builder.ApplyConfiguration(new ResetPasswordConfiguration());
         }
     }
 }

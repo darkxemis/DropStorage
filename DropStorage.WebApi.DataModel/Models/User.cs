@@ -8,6 +8,7 @@ namespace DropStorage.WebApi.DataModel.Models
         {
             FileStorages = new HashSet<FileStorage>();
             LogStatuses = new HashSet<LogStatus>();
+            ResetPasswordLinks = new HashSet<ResetPasswordLink>();
         }
 
         public Guid Id { get; set; }
@@ -23,6 +24,7 @@ namespace DropStorage.WebApi.DataModel.Models
         public virtual Rol? Rol { get; set; }
         public virtual ICollection<LogStatus> LogStatuses { get; set; }
         public virtual ICollection<FileStorage> FileStorages { get; set; }
+        public virtual ICollection<ResetPasswordLink> ResetPasswordLinks { get; set; }
 
     }
 }

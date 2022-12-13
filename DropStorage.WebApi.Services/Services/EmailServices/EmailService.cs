@@ -16,7 +16,7 @@ namespace DropStorage.WebApi.Services.Services.EmailServices
             this.configuration = configuration;
         }
 
-        public async Task<bool> SendMessageAsync()
+        public async Task<bool> SendMessageAsync(string body, string subject, List<string> emailsTo)
         {
             string fromEmail = configuration.GetEmailFrom();
             string passwordHash = configuration.GetPasswordEmail();
@@ -27,9 +27,6 @@ namespace DropStorage.WebApi.Services.Services.EmailServices
 
             bool isSended = false;
             MailAddress fromAddress = new MailAddress(fromEmail, "DropStorage");
-            MailAddress toAddress = new MailAddress("ps3josemiguel@gmail.com", "Josemi");
-            const string subject = "Prueba";
-            const string body = "Otra PRueba";
 
             var smtp = new SmtpClient
             {
@@ -40,12 +37,15 @@ namespace DropStorage.WebApi.Services.Services.EmailServices
                 UseDefaultCredentials = false,
                 Credentials = new NetworkCredential(fromAddress.Address, password)
             };
-            using (var message = new MailMessage(fromAddress, toAddress)
+            using (var message = new MailMessage()
             {
                 Subject = subject,
-                Body = body
+                Body = body,
+                IsBodyHtml = true,
+                From = fromAddress,
             })
             {
+                emailsTo.ForEach(email => message.To.Add(email));
                 await smtp.SendMailAsync(message);
             }
 

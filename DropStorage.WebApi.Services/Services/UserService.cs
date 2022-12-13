@@ -10,6 +10,7 @@ using DropStorage.WebApi.ServicesDataAccess.DataAccess;
 using DropStorage.WebApi.ServicesDataAccess.DTOs;
 using DropStorage.WebApi.ServicesDataAccess.DTOs.Auth;
 using DropStorage.WebApi.ServicesDataAccess.DTOs.User;
+using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Security.Claims;
 
@@ -22,14 +23,18 @@ namespace DropStorage.WebApi.Services.Services
         private readonly IMapper _mapper;
         private readonly LogStatusService _logStatusService;
         private readonly EmailService _emailService;
+        private readonly ResetPasswordLinkDataAccess _resetPasswordLinkDataAccess;
+        private readonly IConfiguration _configuration;
 
-        public UserService(UserDataAccess userDataAccess, JwtTokenService tokenService, IMapper mapper, LogStatusService logStatusService, EmailService emailService)
+        public UserService(UserDataAccess userDataAccess, JwtTokenService tokenService, IMapper mapper, LogStatusService logStatusService, EmailService emailService, ResetPasswordLinkDataAccess resetPasswordLinkDataAccess, IConfiguration configuration)
         {
             _userDataAccess = userDataAccess;
             _tokenService = tokenService;
             _mapper = mapper;
             _logStatusService = logStatusService;
             _emailService = emailService;
+            _resetPasswordLinkDataAccess = resetPasswordLinkDataAccess;
+            _configuration = configuration;
         }
 
         public async Task<UserDTO> GetUserByName(string userName)
@@ -172,11 +177,65 @@ namespace DropStorage.WebApi.Services.Services
             return isDeleted;
         }
 
-        public async Task<bool> ResetPasswordEmail()
+        public async Task<bool> ResetPasswordEmail(string userName)
         {
-            bool isSended = await _emailService.SendMessageAsync();
+            User? user = await _userDataAccess.GetByUsername(userName);
+
+            if (user == null)
+            {
+                throw new HttpStatusException(HttpStatusCode.Forbidden, "User not found");
+            }
+
+            ResetPasswordLink resetPasswordLink = new ResetPasswordLink()
+            {
+                CreateTime = DateTime.Now,
+                ExpirationDate = DateTime.Now.AddMinutes(15),
+                UserId = user.Id
+            };
+
+            resetPasswordLink = await _resetPasswordLinkDataAccess.Create(resetPasswordLink);
+
+            string url = string.Format("{0}ResetPassword/{1}", _configuration.GetUrlWeb(), resetPasswordLink.Id);
+            string subject = "Reset password";
+            string buttomLink = string.Format("<a href='{0}'>Reset password here</a>", url);
+            string body = string.Format("reset your passwork en next link: {0}", buttomLink);
+
+            bool isSended = await _emailService.SendMessageAsync(body, subject, new List<string> () { user.Login });
 
             return isSended;
+        }
+
+        public async Task<bool> ResetPassword(ResetPasswordDTO resetPassword)
+        {
+            if (resetPassword.Password.Trim() != resetPassword.ConfirmPassword.Trim())
+            {
+                throw new HttpStatusException(HttpStatusCode.Forbidden, "Password are not same");
+            }
+
+            ResetPasswordLink resetPasswordLink = await _resetPasswordLinkDataAccess.GetById(resetPassword.RequestPasswordLinkId);
+            if (resetPasswordLink == null)
+            {
+                throw new HttpStatusException(HttpStatusCode.Forbidden, "Error trying to reset password");
+            }
+
+            if (resetPasswordLink.ExpirationDate < DateTime.Now)
+            {
+                throw new HttpStatusException(HttpStatusCode.Forbidden, "The time to reset password expired");
+            }
+
+            User? user = await _userDataAccess.GetUserById(resetPasswordLink.UserId);
+
+            if (user == null)
+            {
+                throw new HttpStatusException(HttpStatusCode.Forbidden, "User not found");
+            }
+
+            string passwordHash = Hasher.GenerateIdentityV3Hash(resetPassword.Password);
+            user.Password = passwordHash;
+
+            await _userDataAccess.UpdateUser(user);
+
+            return true;
         }
     }
 }
