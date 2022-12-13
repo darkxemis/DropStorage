@@ -33,7 +33,7 @@ namespace DropStorage.WebApi.ServicesDataAccess.DataAccess
         public async Task<List<FileStorage>> GetAllFilesByUserId(Guid idUser)
         {
             EFRepository<FileStorage> repo = _EF.Repository<FileStorage>();
-            List<FileStorage> fileStorageList = await repo.Query().Where(file => file.UserId == idUser).Include(file => file.User).ToListAsync();
+            List<FileStorage> fileStorageList = await repo.Query().Where(file => file.UserId == idUser).Include(file => file.User).OrderBy(file => file.Name).ToListAsync();
 
             return fileStorageList;
         }
@@ -47,6 +47,17 @@ namespace DropStorage.WebApi.ServicesDataAccess.DataAccess
             isSaved = await this._EF.SaveChangesAsync();
 
             return isSaved;
+        }
+
+        public async Task<bool> DeleteFile(List<Guid> ids)
+        {
+            bool isRemoved = false;
+            EFRepository<FileStorage> repo = _EF.Repository<FileStorage>();
+
+            repo.DeleteRange(await GetFileStorageList(ids));
+            isRemoved = await this._EF.SaveChangesAsync();
+
+            return isRemoved;
         }
     }
 }

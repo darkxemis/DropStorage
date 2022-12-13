@@ -32,5 +32,10 @@ namespace DropStorage.WebApi.Services.Services
         {
             return await _fileStorageDataAccess.InsertDropStorageFile(fileStorage);
         }
+
+        public async Task<bool> DeleteFiles(List<Guid> ids)
+        {
+            return await _fileStorageDataAccess.DeleteFile(ids);
+        }
     }
 }

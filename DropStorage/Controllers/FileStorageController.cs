@@ -115,5 +115,29 @@ namespace DropStorage.Controllers
 
             return File(fileByte, "image/jpg");
         }
+
+        [Authorize]
+        [Route("api/auth/deletefiles")]
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<bool> DeleteFiles([FromQuery] List<Guid> ids)
+        {
+            List<FileStorage> fileStorageList = await _fileStorageService.GetInfoFiles(ids);
+
+            if (fileStorageList.Count == 0)
+            {
+                throw new HttpStatusException(HttpStatusCode.Forbidden, "File not found");
+            }
+
+            foreach (FileStorage file in fileStorageList)
+            {
+                System.IO.File.Delete(file.Url);
+            }
+
+            bool isRemoved = await _fileStorageService.DeleteFiles(ids);
+
+            return isRemoved;
+        }
     }
 }
