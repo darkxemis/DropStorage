@@ -73,9 +73,9 @@ namespace DropStorage.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<bool> ResetPasswordEmail(string userEmail)
+        public async Task<bool> ResetPasswordEmail(ResetPasswordEmailDTO email)
         {
-            return await _userService.ResetPasswordEmail(userEmail);
+            return await _userService.ResetPasswordEmail(email.Email);
         }
 
         [AllowAnonymous]

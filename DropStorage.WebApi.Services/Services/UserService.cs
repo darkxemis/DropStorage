@@ -195,7 +195,7 @@ namespace DropStorage.WebApi.Services.Services
 
             resetPasswordLink = await _resetPasswordLinkDataAccess.Create(resetPasswordLink);
 
-            string url = string.Format("{0}ResetPassword/{1}", _configuration.GetUrlWeb(), resetPasswordLink.Id);
+            string url = string.Format("{0}public/reset-password/{1}", _configuration.GetUrlWeb(), resetPasswordLink.Id);
             string subject = "Reset password";
             string buttomLink = string.Format("<a href='{0}'>Reset password here</a>", url);
             string body = string.Format("reset your passwork en next link: {0}", buttomLink);
