@@ -64,6 +64,8 @@ namespace DropStorage.Controllers
         [Authorize]
         [Route("api/auth/uploadfiles")]
         [HttpPost]
+        [RequestSizeLimit(500000000)]
+        //[DisableRequestSizeLimit]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<bool> UploadFile([FromForm] IFormFile file)

@@ -3,6 +3,7 @@ using DropStorage.Core.Exceptions;
 using DropStorage.Core.Jwt;
 using DropStorage.Core.Swagger;
 using DropStorage.WebApi.Services;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +31,13 @@ services.AddCors(options =>
            .AllowAnyMethod()
            .AllowAnyHeader();
     });
+});
+
+//Establecemos el valor máximo para el envio de parametros http.
+services.Configure<FormOptions>(x =>
+{
+    x.ValueLengthLimit = int.MaxValue;
+    x.MultipartBodyLengthLimit = int.MaxValue;
 });
 
 //JWT
