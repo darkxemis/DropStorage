@@ -6,6 +6,11 @@ namespace DropStorage.WebApi.DataModel.Models
 {
     public partial class FileStorage : IEntity
     {
+        public FileStorage()
+        {
+            ShareLinkFileStorages = new HashSet<ShareLinkFileStorage>();
+        }
+
         public Guid Id { get; set; }
         public DateTime CreateTime { get; set; }
         public string Name { get; set; } = null!;
@@ -15,5 +20,6 @@ namespace DropStorage.WebApi.DataModel.Models
         public Guid UserId { get; set; }
 
         public virtual User? User { get; set; }
+        public virtual ICollection<ShareLinkFileStorage> ShareLinkFileStorages { get; set; }
     }
 }

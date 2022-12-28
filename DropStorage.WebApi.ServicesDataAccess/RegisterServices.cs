@@ -27,6 +27,7 @@ namespace DropStorage.WebApi.ServicesDataAccess
                 mc.AddProfile(new RolMapper());
                 mc.AddProfile(new UserMapper());
                 mc.AddProfile(new FileStorageMapper());
+                mc.AddProfile(new ShareLinkMapper());
             });
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
@@ -36,6 +37,7 @@ namespace DropStorage.WebApi.ServicesDataAccess
             services.AddTransient<LogStatusDataAccess>();
             services.AddTransient<FileStorageDataAccess>();
             services.AddTransient<ResetPasswordLinkDataAccess>();
+            services.AddTransient<ShareLinkDataAccess>();
 
             return services;
         }
