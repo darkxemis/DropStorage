@@ -15,6 +15,7 @@ namespace DropStorage.WebApi.Services.Extensions
         private const string GetPortEmailName = "Email:Port";
 
         private const string GetUrlWebName = "UrlWeb";
+        private const string GetUrlBaseFilesName = "UrlBaseFiles";
 
         public static string GetConnectionString(this IConfiguration configuration)
         {
@@ -50,6 +51,10 @@ namespace DropStorage.WebApi.Services.Extensions
         public static string GetUrlWeb(this IConfiguration configuration)
         {
             return configuration[GetUrlWebName];
+        }
+        public static string GetUrlBaseFiles(this IConfiguration configuration)
+        {
+            return configuration[GetUrlBaseFilesName];
         }
     }
 }

@@ -92,6 +92,11 @@ namespace DropStorage.WebApi.Services.Services
 
             _mapper.Map(createModifyUserDTO, userToSave);
             userToSave.Password = password;
+            userToSave.DirectoryHome = Path.Combine(_configuration.GetUrlBaseFiles(), userToSave.Login);
+            if (!Directory.Exists(userToSave.DirectoryHome))
+            {
+                Directory.CreateDirectory(userToSave.DirectoryHome);
+            }
 
             bool isSaved = await _userDataAccess.CreateUser(userToSave);
 
