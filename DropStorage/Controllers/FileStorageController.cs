@@ -89,7 +89,7 @@ namespace DropStorage.Controllers
                 Name = file.FileName,
                 Extension = Path.GetExtension(file.FileName),
                 SizeBytes = file.Length,
-                Url = string.Format("{0}{1}", activeUser.DirectoryHome, file.FileName),
+                Url = Path.Combine(activeUser.DirectoryHome, file.FileName),
                 UserId = activeUser.Id
             };
 
