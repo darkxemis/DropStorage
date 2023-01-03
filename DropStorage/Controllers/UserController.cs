@@ -1,9 +1,12 @@
-﻿using DropStorage.WebApi.Services.Services;
+﻿using AutoMapper;
+using DropStorage.WebApi.Services.Exceptions;
+using DropStorage.WebApi.Services.Services;
 using DropStorage.WebApi.ServicesDataAccess.DTOs;
 using DropStorage.WebApi.ServicesDataAccess.DTOs.Auth;
 using DropStorage.WebApi.ServicesDataAccess.DTOs.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace DropStorage.Controllers
 {
@@ -11,10 +14,12 @@ namespace DropStorage.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;
+        private readonly IMapper _mapper;
 
-        public UserController(UserService userService)
+        public UserController(UserService userService, IMapper mapper)
         {
             _userService = userService;
+            _mapper = mapper;
         }
 
         [AllowAnonymous]
@@ -86,6 +91,73 @@ namespace DropStorage.Controllers
         public async Task<bool> ResetPassword(ResetPasswordDTO resetPassword)
         {
             return await _userService.ResetPassword(resetPassword);
+        }
+
+        [Authorize]
+        [Route("api/user/getImg")]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetImg(Guid id)
+        {
+            byte[] imgByte = await this._userService.GetImg(id);
+
+            if (imgByte == null)
+            {
+                return Ok(imgByte);
+            } else
+            {
+                return File(imgByte, "image/jpg");
+            }
+        }
+
+        [Authorize]
+        [Route("api/user/uploadimg")]
+        [HttpPost]
+        [RequestSizeLimit(10000000)]
+        //[DisableRequestSizeLimit]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<bool> UploadFile([FromForm] IFormFile file)
+        {
+            string userName = User.Identity.Name;
+            UserDTO activeUser = await _userService.GetUserByName(userName);
+
+            string newFilePath = Path.Combine(activeUser.DirectoryHome, file.FileName);
+
+            if (activeUser.ProfilePhotoUrl == newFilePath)
+            {
+                return true;
+            }
+
+            if (System.IO.File.Exists(activeUser.ProfilePhotoUrl))
+            {
+                System.IO.File.Delete(activeUser.ProfilePhotoUrl);
+            }
+
+            using (Stream fileStream = new FileStream(newFilePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fileStream);
+            }
+
+            CreateModifyUserDTO createModifyUserDTO = new CreateModifyUserDTO();
+            _mapper.Map(activeUser, createModifyUserDTO);
+            createModifyUserDTO.ProfilePhotoUrl = newFilePath;
+
+            //CreateModifyUserDTO createModifyUserDTO = new CreateModifyUserDTO()
+            //{
+            //    Address = activeUser.Address,
+            //    Login = activeUser.Login,
+            //    ProfilePhotoUrl = newFilePath,
+            //    DirectoryHome = activeUser.DirectoryHome,
+            //    LastName = activeUser.LastName,
+            //    Name = activeUser.Name,
+            //    Password = activeUser.Password,
+            //    RolId = activeUser.RolId,
+            //};
+            await this._userService.UpdateUser(activeUser.Id, createModifyUserDTO);
+
+            return true;
         }
     }
 }
