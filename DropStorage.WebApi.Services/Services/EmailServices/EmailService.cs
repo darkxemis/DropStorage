@@ -47,6 +47,7 @@ namespace DropStorage.WebApi.Services.Services.EmailServices
             {
                 emailsTo.ForEach(email => message.To.Add(email));
                 await smtp.SendMailAsync(message);
+
             }
 
             isSended = true;

@@ -18,7 +18,8 @@ namespace DropStorage.WebApi.ServicesDataAccess.Mappers
             CreateMap<UserDTO, User>();
 
             //Create Modify
-            CreateMap<CreateModifyUserDTO, User>().ForMember(x => x.Password, opt => opt.Ignore());
+            CreateMap<CreateModifyUserDTO, User>();
+            CreateMap<UserDTO, CreateModifyUserDTO>();
         }
     }
 }

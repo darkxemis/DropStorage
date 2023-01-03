@@ -25,7 +25,7 @@ namespace DropStorage.WebApi.ServicesDataAccess.DataAccess
         public async Task<List<FileStorage>> GetFileStorageList(List<Guid> ids)
         {
             EFRepository<FileStorage> repo = _EF.Repository<FileStorage>();
-            List<FileStorage> fileStorageList = await repo.Query().Where(file => ids.Contains(file.Id)).ToListAsync();
+            List<FileStorage> fileStorageList = await repo.Query().Where(file => ids.Contains(file.Id)).Include(file => file.ShareLinkFileStorages).ToListAsync();
 
             return fileStorageList;
         }
@@ -53,8 +53,15 @@ namespace DropStorage.WebApi.ServicesDataAccess.DataAccess
         {
             bool isRemoved = false;
             EFRepository<FileStorage> repo = _EF.Repository<FileStorage>();
+            EFRepository<ShareLinkFileStorage> repoShare = _EF.Repository<ShareLinkFileStorage>();
+            List<FileStorage> fileStorageDelte = await GetFileStorageList(ids);
+            List<ShareLinkFileStorage> shareLinkFileStorage = repoShare.Query().Where(fileShared => fileStorageDelte
+                .Select(file => file.Id)
+                .Contains(fileShared.IdFileStorage))
+                .ToList();
 
-            repo.DeleteRange(await GetFileStorageList(ids));
+            repoShare.DeleteRange(shareLinkFileStorage);
+            repo.DeleteRange(fileStorageDelte);
             isRemoved = await this._EF.SaveChangesAsync();
 
             return isRemoved;

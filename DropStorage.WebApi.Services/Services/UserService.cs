@@ -125,11 +125,11 @@ namespace DropStorage.WebApi.Services.Services
 
             _mapper.Map(createModifyUserDTO, userToModify);
 
-            string passwordInDTO = Hasher.GenerateIdentityV3Hash(createModifyUserDTO.Password);
-            if (passwordInDTO != userToModify.Password)
-            {
-                userToModify.Password = passwordInDTO;
-            }
+            //string passwordInDTO = Hasher.GenerateIdentityV3Hash(createModifyUserDTO.Password);
+            //if (passwordInDTO != userToModify.Password)
+            //{
+            //    userToModify.Password = passwordInDTO;
+            //}
 
             bool isSaved = await _userDataAccess.UpdateUser(userToModify);
 
@@ -241,6 +241,24 @@ namespace DropStorage.WebApi.Services.Services
             await _userDataAccess.UpdateUser(user);
 
             return true;
+        }
+
+        public async Task<byte[]> GetImg(Guid userId)
+        {
+            User? user = await _userDataAccess.GetUserById(userId);
+
+            if (user == null)
+            {
+                throw new HttpStatusException(HttpStatusCode.Forbidden, "User not found");
+            }
+
+            if (File.Exists(user.ProfilePhotoUrl))
+            {
+                return File.ReadAllBytes(user.ProfilePhotoUrl);
+            } else
+            {
+                return null;
+            }
         }
     }
 }
