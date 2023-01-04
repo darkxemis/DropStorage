@@ -42,6 +42,15 @@ namespace DropStorage.Controllers
             List<FileStorage> fileStorageList = await _fileStorageService.GetInfoFiles(ids);
 
             var zipName = $"{DateTime.Now.ToString("yyyy_MM_dd-HH_mm_ss")}.zip";
+
+            // When have only one file and is a zip file return it
+            if (fileStorageList.Count == 1 && fileStorageList.FirstOrDefault()?.Extension == ".zip")
+            {
+                FileStorage fileStorage = fileStorageList.FirstOrDefault();
+                byte[] fileZip = System.IO.File.ReadAllBytes(fileStorage.Url);
+                return this.File(fileZip, "application/zip", zipName);
+            }
+            
             using (MemoryStream ms = new MemoryStream())
             {
                 using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, true))
