@@ -3,6 +3,7 @@ using DropStorage.Core.Exceptions;
 using DropStorage.Core.Jwt;
 using DropStorage.Core.Swagger;
 using DropStorage.WebApi.Services;
+using DropStorage.WebApi.Services.Extensions.ModelConfiguration;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -14,6 +15,8 @@ builder.Services.AddControllers();
 
 IWebHostEnvironment environment = builder.Environment;
 IConfiguration configuration = builder.Configuration;
+
+builder.Services.Configure<EmailConfiguration>(configuration.GetSection("Email"));
 
 // Services
 IServiceCollection services = builder.Services;

@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using DropStorage.WebApi.Services.Exceptions;
+using DropStorage.WebApi.Services.Extensions.ModelConfiguration;
 using DropStorage.WebApi.Services.Services;
 using DropStorage.WebApi.ServicesDataAccess.DTOs;
 using DropStorage.WebApi.ServicesDataAccess.DTOs.Auth;
 using DropStorage.WebApi.ServicesDataAccess.DTOs.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Net;
 
 namespace DropStorage.Controllers
@@ -15,12 +17,14 @@ namespace DropStorage.Controllers
     {
         private readonly UserService _userService;
         private readonly IMapper _mapper;
+        private readonly EmailConfiguration _emailConfiguration;
 
-        public UserController(UserService userService, IMapper mapper)
+        public UserController(UserService userService, IMapper mapper, IOptions<EmailConfiguration> emailConfiguration)
         {
             _userService = userService;
             _mapper = mapper;
-        }
+            _emailConfiguration = emailConfiguration.Value;
+        } 
 
         [AllowAnonymous]
         [Route("api/auth/token")]
@@ -81,6 +85,16 @@ namespace DropStorage.Controllers
         public async Task<bool> ResetPasswordEmail(ResetPasswordEmailDTO email)
         {
             return await _userService.ResetPasswordEmail(email.Email);
+        }
+
+        [AllowAnonymous]
+        [Route("api/user/prueba")]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public EmailConfiguration Prueba()
+        {
+            return _emailConfiguration;
         }
 
         [AllowAnonymous]
